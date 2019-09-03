@@ -48,7 +48,7 @@ if(isset($_POST['submit']))
             }
             else 
             {
-                $query = "SELECT DISTINCT `email` FROM test WHERE email="$salt.$email"";    
+                
             }
     }
 
