@@ -48,7 +48,30 @@ if(isset($_POST['submit']))
             }
             else 
             {
-                
+                $query = "SELECT id FROM `test` WHERE email='".mysqli_real_escape_string($email)."' LIMIT 1";
+
+                $result = mysqli_query($link, $query);
+
+                if(mysqli_num_rows($result)>0)
+                {
+                    $errors['already'][] = "This User already exists!! Please register with another account details!!"; 
+                }
+
+                else {
+                    $query = "INSERT INTO `test`(`email`,`password`) VALUES ('".mysqli_real_escape_string($link,$email)."','".mysqli_real_escape_string($link,$password)."'";
+                    if(!mysqli_query($link, $query)
+                    {
+                        echo "There is a problem in insertion !";
+                    }
+                    else {
+                        $idFetched = mysqli_insert_id($link);
+                        $query = "UPDATE `test` SET password = '".md5(md5($idFetched).$_POST['pass'])."' WHERE id=".$idFetched." LIMIT 1";
+
+                        mysqli_query($link, $query);
+
+                    }
+                    
+                }
             }
     }
 
@@ -209,7 +232,22 @@ if(isset($_POST['submit']))
                 <?php
             }
             ?>
-            <p class="errReport" id="alreadyErr">This User already exists!! Please register with another account details!!</p>
+            <?php
+            if(!empty($errors['already']))
+            {
+                ?>
+                <div class="alert alert-warning" role="alert">
+                <?php
+                foreach($errors['already'] as $msg)
+                {
+                    echo $msg.'<br>';
+                }
+                ?>
+                </div>
+                <?php
+                }
+                ?>
+            <!-- <p class="errReport" id="alreadyErr">This User already exists!! Please register with another account details!!</p> -->
         </div>
         <div class="flex-c" id="">
             <button type="submit" class="btn btn-success" name="submit">Submit</button>
