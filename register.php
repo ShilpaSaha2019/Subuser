@@ -1,4 +1,7 @@
 <?php
+
+session_start();
+include "header.php";
 if(isset($_POST['submit']))
 {
     require 'connection.php';
@@ -48,7 +51,7 @@ if(isset($_POST['submit']))
             }
             else 
             {
-                $query = "SELECT id FROM `test` WHERE email='".mysqli_real_escape_string($email)."' LIMIT 1";
+                $query = "SELECT id FROM `test` WHERE email='".mysqli_real_escape_string($link,$email)."' LIMIT 1";
 
                 $result = mysqli_query($link, $query);
 
@@ -58,20 +61,30 @@ if(isset($_POST['submit']))
                 }
 
                 else {
-                    $query = "INSERT INTO `test`(`email`,`password`) VALUES ('".mysqli_real_escape_string($link,$email)."','".mysqli_real_escape_string($link,$password)."'";
-                    if(!mysqli_query($link, $query)
-                    {
-                        echo "There is a problem in insertion !";
-                    }
-                    else {
+                    echo $query = "INSERT INTO `test`(`email`,`password`) VALUES ('".mysqli_real_escape_string($link,$email)."','".mysqli_real_escape_string($link,$password)."')";
+                    
+                    mysqli_query($link, $query) or die(mysqli_error($link));
+                    // if(!mysqli_query($link, $query))
+                    
+                    //     echo "There is a problem in insertion !";
+                    // 
+                    
                         $idFetched = mysqli_insert_id($link);
                         $query = "UPDATE `test` SET password = '".md5(md5($idFetched).$_POST['pass'])."' WHERE id=".$idFetched." LIMIT 1";
 
                         mysqli_query($link, $query);
 
-                    }
+                        $_SESSION['ID'] = $idFetched;
+
+                        if($_POST['stayLoggedIn'] == '1')
+                        {
+                            setcookie("ID",mysqli_insert_id($link),time()+60*60*24*365);
+                        }
+                        header("location: profile.php");
+
                     
-                }
+                }  
+                
             }
     }
 
@@ -89,42 +102,6 @@ if(isset($_POST['submit']))
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Register</title>
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
-    </script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-    </script>
-
-
-    <style>
-    .flex-c{
-        display: flex;
-        flex-direction:column;
-    }
-
-    .flex-r{
-        display:flex;
-        flex-direction:row;
-    }
-
-    .main-div{
-        max-width: 100%;
-        margin: 10% 30% 10% 30%;
-    }
-
-    #errEmail
-    {
-    }
-    </style>
 </head>
 <body>
 <form action="" method="post">
@@ -248,6 +225,9 @@ if(isset($_POST['submit']))
                 }
                 ?>
             <!-- <p class="errReport" id="alreadyErr">This User already exists!! Please register with another account details!!</p> -->
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="stayLoggedIn" value=1>Stay Logged In
         </div>
         <div class="flex-c" id="">
             <button type="submit" class="btn btn-success" name="submit">Submit</button>
