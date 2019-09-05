@@ -38,6 +38,14 @@
             width: 100px;
             background-color:darkgoldenrod;
         }
+        .welcome-div{
+            padding: 10px;
+            background-color: yellow;
+        }
+        .name-display-div{
+            margin-left: 1rem;
+            font-size: 2rem;
+        }
         </style>
 </head>
 <body>

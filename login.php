@@ -40,7 +40,7 @@ if(empty($errors) && empty($errField))
         if($hashedPassword == $row['password'])
         {
             $_SESSION['ID']=$row['id'];
-            header("location: profile.php");
+            header("location: loggedin.php");
         }
         else {
             $errField['errPass'] = 1;
