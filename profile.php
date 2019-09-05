@@ -1,20 +1,17 @@
 <?php
 session_start();
-include "header.php";
+
 if(isset($_POST['save']))
 {
-    // echo "<pre>";
-    // print_r($_POST);
-    // echo "</pre>";
     require 'connection.php';
-
+    
     function dump($arr)
     {
         echo '<pre>';
         print_r($arr);
         echo '</pre>';
     }
-   
+    // dump($_POST);
     $whitelist = ['name','address','contactNo','designation','passoutYear','certification','highestDegree'];
     $errors = [];
     foreach($whitelist as $val)
@@ -24,27 +21,45 @@ if(isset($_POST['save']))
             $errors[]= "{$val} field is missing";
         }
     }
-    //dump($errors);
+    // dump($errors);
 
-    $requiredFields=['name','address','contactNo'];
-    $errorField =[];
+    $requiredFields = ['name','address','contactNo'];
+    $errorField = [];
     foreach($requiredFields as $key)
     {
-        if(!isset($_POST[$key]))
+        if(!($_POST[$key]))
         {
             $errorField[$key] = 1;
         }
     }
-     dump($errorField);
+    //  dump($errorField);
 
     if($_POST['contactNo'] && !preg_match('/^[0-9]{10}+$/', $_POST['contactNo']))
     {
         $errorField['errContact'] = "Contact Number should contain Numeric values";
     }
     
+    if(empty($errors) && empty($errorField))
+    {
+        $query = "UPDATE `test` SET name='{$_POST['name']}',address='{$_POST['address']}',contact='{$_POST['contactNo']}',designation='".$_POST['designation']."',highestdegree='".$_POST['highestDegree']."',passoutYear='{$_POST['passoutYear']}',certification='{$_POST['certification']}' WHERE id='".$_SESSION['ID']."' ";
+        //$stmt = $link->prepare("INSERT INTO test (name,address,contact,designation,highestDegree,passoutYear,certification) VALUES (?,?,?,?,?,?,?)");
+        //$stmt->bind_param("ssissss", $_POST['name'],$_POST['address'],$_POST['contactNo'],$_POST['designation'],$_POST['highestDegree'],$_POST['passoutYear'],$_POST['certification']);
+        
+        if(mysqli_query($link,$query))
+        {
+            $errorField['prflUpdate'] = 1;
+        }
+        else 
+        {
+            $errorField['errUpdate'] = 1;
+        }
+    }
+    else {
+        echo "There is a problem in input fields";
+    }
 }
 ?>
-
+<?php include "header.php";?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,6 +72,35 @@ if(isset($_POST['save']))
 <body>
 <form action="" method="post">
 <div class="flex-c main-div">
+    <div>
+    <?php
+    if(!empty($errorField['prflUpdate']))
+    {
+    ?>
+        <div class="alert alert-success flex-r" role="alert">
+            <?php
+            echo "Profile updated successfully";
+            ?>
+            <div><a href="loggedin.php">Go to Profile</a></div>
+        </div>
+        <?php
+        }
+        ?>
+    </div>
+    <div>
+        <?php
+        if(!empty($errorField['errUpdate']))
+        {
+        ?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+            echo "Profile is not updated successfully!"
+            ?>
+        </div>
+        <?php
+        }
+        ?>
+    </div>
     <div class="img-div"><img src="" alt=""></div>
     <div class="form-group" id="">Name<input type="text" class="form-control" id="" name="name">
     <?php

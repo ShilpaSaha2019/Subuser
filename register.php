@@ -1,11 +1,10 @@
 <?php
 
 session_start();
-include "header.php";
+
 if(isset($_POST['submit']))
 {
     require 'connection.php';
-    // include 'formValidation.php';
     $errors = [];
 
     //checking submission fields empty errors
@@ -78,7 +77,7 @@ if(isset($_POST['submit']))
 
                         if($_POST['stayLoggedIn'] == '1')
                         {
-                            setcookie("ID",mysqli_insert_id($link),time()+60*60*24*365);
+                            setcookie("ID",mysqli_insert_id($link),time()+60*60*24);
                         }
                         header("location: profile.php");
 
@@ -94,7 +93,7 @@ if(isset($_POST['submit']))
 ?>
 
 
-
+<?php include "header.php";?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
