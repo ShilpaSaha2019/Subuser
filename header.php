@@ -38,13 +38,27 @@
             width: 100px;
             background-color:darkgoldenrod;
         }
-        .welcome-div{
+        .div1{
             padding: 10px;
             background-color: yellow;
         }
-        .name-display-div{
+        .div2{
+            background-color: grey;
+            padding: 10px;
+        }
+        .div3{
+            background-color: orange;
+        }
+        .div4{
+            background-color: skyblue;
+        }
+        .display-div1{
             margin-left: 1rem;
             font-size: 2rem;
+        }
+        .display-div2{
+            margin-left: 1rem;
+            font-size: 1.7rem;
         }
         </style>
 </head>

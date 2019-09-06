@@ -52,9 +52,9 @@ if(isset($_POST['submit']))
             {
                 $query = "SELECT id FROM `test` WHERE email='".mysqli_real_escape_string($link,$email)."' LIMIT 1";
 
-                $result = mysqli_query($link, $query);
+                $result = $link->query( $query);
 
-                if(mysqli_num_rows($result)>0)
+                if($result->num_rows >0 )
                 {
                     $errors['already'][] = "This User already exists!! Please register with another account details!!"; 
                 }
@@ -62,23 +62,23 @@ if(isset($_POST['submit']))
                 else {
                     echo $query = "INSERT INTO `test`(`email`,`password`) VALUES ('".mysqli_real_escape_string($link,$email)."','".mysqli_real_escape_string($link,$password)."')";
                     
-                    mysqli_query($link, $query) or die(mysqli_error($link));
+                    $link->query($query) or die($link->error);
                     // if(!mysqli_query($link, $query))
                     
                     //     echo "There is a problem in insertion !";
                     // 
                     
-                        $idFetched = mysqli_insert_id($link);
+                        $idFetched = $link->insert_id;
                         $query = "UPDATE `test` SET password = '".md5(md5($idFetched).$_POST['pass'])."' WHERE id=".$idFetched." LIMIT 1";
 
-                        mysqli_query($link, $query);
+                        $link->query($query);
 
                         $_SESSION['ID'] = $idFetched;
 
-                        if($_POST['stayLoggedIn'] == '1')
-                        {
-                            setcookie("ID",mysqli_insert_id($link),time()+60*60*24);
-                        }
+                        // if($_POST['stayLoggedIn'] == '1')
+                        // {
+                        //     setcookie("ID",$link->insert_id,time()+60*60*24);
+                        // }
                         header("location: profile.php");
 
                     
@@ -230,7 +230,7 @@ if(isset($_POST['submit']))
         </div>
         <div class="flex-c" id="">
             <button type="submit" class="btn btn-success" name="submit">Submit</button>
-            <a href="login.php">Already registered? Click to login!</a>
+            <a href="index.php">Already registered? Click to login!</a>
         </div>
     </div>
 </form>

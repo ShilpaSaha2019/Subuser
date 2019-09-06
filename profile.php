@@ -1,10 +1,20 @@
 <?php
-session_start();
+require 'connection.php';
+if(empty($_SESSION['is_loggedin']))
+{
+    header('location:.');
+}
+
+$query = "SELECT * FROM `test` WHERE id='{$_SESSION['ID']}'";
+if($link->query($query))
+{
+    $result = $link->query($query);
+    $row = $result->fetch_assoc();
+}
+
 
 if(isset($_POST['save']))
 {
-    require 'connection.php';
-    
     function dump($arr)
     {
         echo '<pre>';
@@ -45,7 +55,7 @@ if(isset($_POST['save']))
         //$stmt = $link->prepare("INSERT INTO test (name,address,contact,designation,highestDegree,passoutYear,certification) VALUES (?,?,?,?,?,?,?)");
         //$stmt->bind_param("ssissss", $_POST['name'],$_POST['address'],$_POST['contactNo'],$_POST['designation'],$_POST['highestDegree'],$_POST['passoutYear'],$_POST['certification']);
         
-        if(mysqli_query($link,$query))
+        if($link->query($query))
         {
             $errorField['prflUpdate'] = 1;
         }
@@ -102,7 +112,7 @@ if(isset($_POST['save']))
         ?>
     </div>
     <div class="img-div"><img src="" alt=""></div>
-    <div class="form-group" id="">Name<input type="text" class="form-control" id="" name="name">
+    <div class="form-group" id="">Name<input type="text" class="form-control" id="" name="name" value="<?php echo $row['name']; ?>">
     <?php
      if(!empty($errorField['name']))
     {
@@ -116,7 +126,7 @@ if(isset($_POST['save']))
     }
     ?>
     </div>
-    <div class="form-group" id="">Address<input type="text" class="form-control" id="" name="address">
+    <div class="form-group" id="">Address<input type="text" class="form-control" id="" name="address" value="<?php echo $row['address']; ?>">
     <?php
     if(!empty($errorField['address']))
     {
@@ -130,7 +140,7 @@ if(isset($_POST['save']))
     }
     ?>
     </div>
-    <div class="form-group" id="">Contact No.<input type="text" class="form-control" id="" name="contactNo">
+    <div class="form-group" id="">Contact No.<input type="text" class="form-control" id="" name="contactNo" value="<?php echo $row['contact']; ?>"> 
     <?php
     if(!empty($errorField['contactNo']))
     {
@@ -156,19 +166,20 @@ if(isset($_POST['save']))
     }
     ?>
     </div>
-    <div class="form-group" id="">Designation<input type="text" class="form-control" id="" name="designation"></div>
+    <div class="form-group" id="">Designation<input type="text" class="form-control" id="" name="designation" value="<?php echo $row['designation']; ?>"></div>
     <div class="form-group" id="">Highest Degree
-        <select class="form-control" name="highestDegree">
+        <select class="form-control" name="highestDegree" value="<?php echo $row['highestDegree']; ?>">
             <option value="">--Select Degree--</option>
-            <option value="hs">Higher Secondary</option>
-            <option value="btech">B.Tech</option>
+            <option value="hs"<?php if($row['highestDegree'] == "hs"){?> selected<?php}?>>Higher Secondary</option>
+            <option value="btech" 
+            <?php if($row['highestDegree'] == "btech") {?> selected<?php}?>>B.Tech</option>
             <option value="mtech">M.Tech</option>
             <option value="bca">BCA</option>
             <option value="mca">MCA</option>
         </select>
     </div>
-    <div class="form-group">Passout Year<input type="date" class="form-control" name="passoutYear"></div>
-    <div class="form-group" id="">Certification<textarea class="form-control" rows="3" name="certification"></textarea></div>
+    <div class="form-group">Passout Year<input type="date" class="form-control" name="passoutYear" value="<?php echo $row['passoutYear']; ?>"></div>
+    <div class="form-group" id="">Certification<textarea class="form-control" rows="3" name="certification" value="<?php echo $row['certification']; ?>"></textarea></div>
     <div class="form-group" id=""><button type="submit" name="save" class="btn btn-success">Save</button></div>
     </div>
     </form>

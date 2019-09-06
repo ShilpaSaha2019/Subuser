@@ -1,50 +1,135 @@
+<?php
+require 'connection.php';
+
+if(!empty($_SESSION['is_loggedin'])){
+    header('location:loggedin.php');
+}
+
+if(isset($_POST['submit']))
+{
+$whitelist = ['email','password'];
+$errors = [];
+foreach($whitelist as $key)
+{
+    if(!isset($_POST[$key]))
+    {
+        $errors[] = "{$key} field is missing";
+    }
+}
+
+$requiredFields = ['email','password'];
+$errField = [];
+foreach($requiredFields as $val)
+{
+    if(!($_POST[$val]))
+    {
+        $errField[$val] = 1;
+    }
+}
+// function dump($arr)
+//     {
+//         echo '<pre>';
+//         print_r($arr);
+//         echo '</pre>';
+//     }
+if(empty($errors) && empty($errField))
+{
+    $query = "SELECT * FROM `test` WHERE email='".mysqli_real_escape_string($link,$_POST['email'])."'";
+    $result = $link->query($query);
+    if($result->num_rows>0)
+    {
+        $row = $result->fetch_assoc();
+        $hashedPassword = md5(md5($row['id']).$_POST['password']);
+        if($hashedPassword == $row['password'])
+        {
+            $_SESSION['ID']=$row['id'];
+            $_SESSION['is_loggedin'] = true;
+            header("location: loggedin.php");
+        }
+        else {
+            $errField['errPass'] = 1;
+        }
+    }
+    else {
+        $errField['errUser'] = 1;
+    }
+}
+
+}
+?>
+<?php include 'header.php';?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Home Page</title>
-
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
-    </script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-    </script>
-
-    <style>
-
-        .flex-r{
-            display:flex;
-            flex-direction:row;
-        }
-
-    </style>
+    <title>Document</title>
 </head>
 <body>
-
-
-    <div class="flex-r container main-div">
-        <div class="container inner-div">
-            <button class="btn btn-primary" id="register" onClick="window.location = 'register.php'">Register</button>
-            <button class="btn btn-primary" id="login" onClick="window.location = 'login.php'">Login</button>
+<form action="" method="post">
+<div class="flex-c main-div">
+<div class=" form-group" id="">
+    <label for="">Email</label>
+    <input type="text" name="email" class="form-control" placeholder="abcd@xyz.com">
+    <?php
+    if(!empty($errField['email']))
+    {
+        ?>
+        <div class="alert alert-danger" role="alert">
+        <?php
+        echo "Email is required!";
+        ?>
+        </div>
+        <?php
+    }
+    ?>
+</div>
+<div class=" form-group" id="">
+    <label for="">Password</label>
+    <input type="password" name="password" class="form-control" placeholder="*****">
+    <!-- <input type="hidden" name="signIn" value="1"> -->
+    <?php
+    if(!empty($errField['password']))
+    {
+    ?>
+    <div class="alert alert-danger" role="alert">
+    <?php
+    echo "Password is required!!";
+    ?>
     </div>
+    <?php
+    }
+    ?>
+     <?php
+    if(!empty($errField['errPass']))
+    {
+    ?>
+    <div class="alert alert-danger" role="alert">
+    <?php
+    echo "That Email/Password combination could not be found!";
+    ?>
     </div>
-
-
+    <?php
+    }
+    ?>
+     <?php
+    if(!empty($errField['errUser']))
+    {
+    ?>
+    <div class="alert alert-danger" role="alert">
+    <?php
+    echo "User not found!";
+    ?>
+    </div>
+    <?php
+    }
+    ?>
+</div>
+<div class=" form-group" id="">
+    <button type="submit" class="btn btn-success" name="submit">Login</button>
+    <p><a href="register.php">Not registered? Click to Register!</a></p>
+</div>
+</div>
 </body>
 </html>
-
-
-
-
-
