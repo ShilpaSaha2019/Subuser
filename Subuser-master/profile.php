@@ -168,14 +168,16 @@ if(isset($_POST['save']))
     </div>
     <div class="form-group" id="">Designation<input type="text" class="form-control" id="" name="designation" value="<?php echo $row['designation']; ?>"></div>
     <div class="form-group" id="">Highest Degree
-        <select class="form-control" name="highestDegree" value="<?php echo $row['highestDegree']; ?>" selected>
+        <select class="form-control" name="highestDegree">
             <option value="">--Select Degree--</option>
-            <option value="btech">
-            <?php if($row['highestDegree']=="btech")
-            {
-                ?> <option selected>B.Tech</option><?php
-            } ?>    
-            B.Tech</option>
+            
+
+            <?php if($row['highestDegree']=="btech") { ?>
+                <option value="btech" selected>B.Tech</option>
+             <?php } else { ?>
+                <option value="btech">B.Tech</option>
+             <?php } ?>
+
             <option value="hs">Higher Secondary</option>
             <option value="mtech">
             <?php if($row['highestDegree']=="mtech")
