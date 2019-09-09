@@ -36,7 +36,7 @@
         .img-div{
             height: 100px;
             width: 100px;
-            background-color:darkgoldenrod;
+            
         }
         .div1{
             padding: 10px;

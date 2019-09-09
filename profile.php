@@ -12,6 +12,10 @@ if($link->query($query))
     $row = $result->fetch_assoc();
 }
 
+$validExtensions = ['jpg','jpeg','png'];
+$mimeTypes = ['image/jpeg','image/png','image/jpg'];
+
+$style="width:80px; height:80px; margin:5%; margin-right:0; border:2px solid black; border-radius:10%;";
 
 if(isset($_POST['save']))
 {
@@ -22,6 +26,8 @@ if(isset($_POST['save']))
         echo '</pre>';
     }
     // dump($_POST);
+    dump($_FILES);
+
     $whitelist = ['name','address','contactNo','designation','passoutYear','certification','highestDegree'];
     $errors = [];
     foreach($whitelist as $val)
@@ -51,17 +57,46 @@ if(isset($_POST['save']))
     
     if(empty($errors) && empty($errorField))
     {
-        $query = "UPDATE `test` SET name='{$_POST['name']}',address='{$_POST['address']}',contact='{$_POST['contactNo']}',designation='".$_POST['designation']."',highestdegree='".$_POST['highestDegree']."',passoutYear='{$_POST['passoutYear']}',certification='{$_POST['certification']}' WHERE id='".$_SESSION['ID']."' ";
+        if(!empty($_FILES))
+        {
+            $a = explode('.',$_FILES['image']['name']);
+            $extension = array_pop($a);
+            
+            if(!in_array($extension,$validExtensions) && !in_array($_FILES['image']['type'],$mimeTypes))
+            {
+                echo "File type should be image";
+            }
+            else{
+            
+                if($_FILES['image']['size']<=200000)
+                {
+                $target = "images/".basename($_FILES['image']['name']);
+
+                $image = $_FILES['image']['name'];
+
+
+                if(move_uploaded_file($_FILES['image']['tmp_name'],$target))
+                {
+                    echo "Image uploaded successfully";
+                }
+                else {
+                    echo "Image upload failed";
+                }
+                
+        $query = "UPDATE `test` SET name='{$_POST['name']}',address='{$_POST['address']}',contact='{$_POST['contactNo']}',designation='".$_POST['designation']."',highestdegree='{$_POST['highestDegree']}',passoutYear='{$_POST['passoutYear']}',certification='{$_POST['certification']}',showDp='{$_FILES['image']['name']}' WHERE id='".$_SESSION['ID']."' ";
         //$stmt = $link->prepare("INSERT INTO test (name,address,contact,designation,highestDegree,passoutYear,certification) VALUES (?,?,?,?,?,?,?)");
         //$stmt->bind_param("ssissss", $_POST['name'],$_POST['address'],$_POST['contactNo'],$_POST['designation'],$_POST['highestDegree'],$_POST['passoutYear'],$_POST['certification']);
         
-        if($link->query($query))
-        {
-            $errorField['prflUpdate'] = 1;
-        }
-        else 
-        {
-            $errorField['errUpdate'] = 1;
+                if($link->query($query))
+                {
+                    $errorField['prflUpdate'] = 1;
+                }
+                else 
+                {
+                    $errorField['errUpdate'] = 1;
+                }
+                }
+            }
         }
     }
     else {
@@ -80,7 +115,7 @@ if(isset($_POST['save']))
     
 </head>
 <body>
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
 <div class="flex-c main-div">
     <div>
     <?php
@@ -111,7 +146,17 @@ if(isset($_POST['save']))
         }
         ?>
     </div>
-    <div class="img-div"><img src="" alt=""></div>
+    <input type="file" name="image">
+    <div>
+    <input type="hidden" name="">
+    <?php 
+    $img= $row['showDp'];
+    echo "<div class='img-div'>";
+    echo " <img src='images/{$img}' style='{$style}'> </img> "; 
+    //echo "<p>".$errorField['upload']."</p>" ;
+    echo "</div>";
+    ?>
+    </div>
     <div class="form-group" id="">Name<input type="text" class="form-control" id="" name="name" value="<?php echo $row['name']; ?>">
     <?php
      if(!empty($errorField['name']))
@@ -168,18 +213,43 @@ if(isset($_POST['save']))
     </div>
     <div class="form-group" id="">Designation<input type="text" class="form-control" id="" name="designation" value="<?php echo $row['designation']; ?>"></div>
     <div class="form-group" id="">Highest Degree
-        <select class="form-control" name="highestDegree" value="<?php echo $row['highestDegree']; ?>">
+        <select class="form-control" name="highestDegree">
             <option value="">--Select Degree--</option>
-            <option value="hs"<?php if($row['highestDegree'] == "hs"){?> selected<?php}?>>Higher Secondary</option>
-            <option value="btech" 
-            <?php if($row['highestDegree'] == "btech") {?> selected<?php}?>>B.Tech</option>
-            <option value="mtech">M.Tech</option>
-            <option value="bca">BCA</option>
-            <option value="mca">MCA</option>
+
+            <?php if($row['highestDegree']=="hs") { ?>
+                <option value="hs" selected>Higher Secondary</option>
+            <?php } else{ ?>
+                <option value="hs">Higher Secondary</option>
+            <?php }?>
+
+            <?php if($row['highestDegree']=="btech") { ?>
+                <option value="btech" selected>B.Tech</option>
+             <?php } else { ?>
+                <option value="btech">B.Tech</option>
+             <?php } ?>
+
+            <?php if($row['highestDegree']=="mtech") { ?>
+                <option value="mtech" selected> M.Tech</option>
+            <?php } else{ ?>
+                <option value="mtech"> M.Tech</option>
+            <?php }?>
+            
+            <?php if($row['highestDegree']=="bca") { ?>
+                <option value="bca" selected>BCA</option>
+            <?php } else{ ?>
+                <option value="bca">BCA</option>
+            <?php }?>
+            
+            <?php if($row['highestDegree']=="mca") { ?>
+                <option value="mca" selected>MCA</option>
+            <?php } else{ ?>
+                <option value="mca">MCA</option>
+            <?php }?>
+            
         </select>
     </div>
     <div class="form-group">Passout Year<input type="date" class="form-control" name="passoutYear" value="<?php echo $row['passoutYear']; ?>"></div>
-    <div class="form-group" id="">Certification<textarea class="form-control" rows="3" name="certification" value="<?php echo $row['certification']; ?>"></textarea></div>
+    <div class="form-group" id="">Certification<textarea class="form-control" rows="3" name="certification"><?php echo $row['certification'];?></textarea></div>
     <div class="form-group" id=""><button type="submit" name="save" class="btn btn-success">Save</button></div>
     </div>
     </form>
