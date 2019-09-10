@@ -60,6 +60,11 @@
             margin-left: 1rem;
             font-size: 1.7rem;
         }
+        #gallery
+        {
+            background-color: #42D6A4;
+            width:380px; height:380px; margin:1% 5% 1% 5%; margin-right:0; border:2px solid black;
+        }
         </style>
 </head>
 <body>

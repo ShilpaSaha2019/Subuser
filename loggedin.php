@@ -5,15 +5,23 @@ if(empty($_SESSION['is_loggedin'])){
     header('location:.');
 }
 
-
-
 include 'header.php';
-$query = "SELECT * FROM `test` WHERE id='{$_SESSION['ID']}'";
-if($link->query($query))
-{
-    $result = $link->query($query);
-    $row = $result->fetch_assoc();
-}
+$style="width:300px; height:380px; margin:5%; margin-right:0; border:2px solid black;";
+$style1="width:60px; height:60px; margin:5%; margin-right:0; border:2px solid black;";
+    $query = "SELECT * FROM `test` WHERE id='{$_SESSION['ID']}'";
+    if($link->query($query))
+    {
+        $result = $link->query($query);
+        $row = $result->fetch_assoc();
+    }
+
+$fileList = [];
+function dump($arr)
+    {
+        echo '<pre>';
+        print_r($arr);
+        echo '</pre>';
+    }
 ?>
 
 <!DOCTYPE html>
@@ -29,8 +37,54 @@ if($link->query($query))
     <h1>Welcome</h1>
     <div class="display-div1">
     <?php
+    
     echo $row['name'];
     ?>
+    </div>
+    <div>
+    <?php 
+    $img= $row['showDp'];
+    echo " <img src='images/{$img}' style='{$style}'></img> " ?>
+    </div>
+    <div id="gallery">
+    <?php 
+            $dir = "images/";
+            if(is_dir($dir))
+            { 
+            if($dh = opendir($dir))
+            {
+                while(($file = readdir($dh))!==false)
+                {
+                    $fileList[]=$file;
+                }
+            
+            } 
+            }
+            // dump($fileList);
+            foreach($fileList as $file)
+            {
+                echo " <img src='images/{$file}' style='{$style1}' id='clickedImg' onclick='myFunction()'></img> ";
+            }
+    ?>
+    <script type="text/javascript">
+    function myFunction(){
+        alert ("Image is clicked");
+        // <?php 
+        // echo "Hello your dp is changed";
+        //     $query = "UPDATE `test` SET showDp='{$file}' WHERE id='".$_SESSION['ID']."'";
+        //     if($link->query($query))
+        //     {
+        //         $query = "SELECT * FROM `test` WHERE id='{$_SESSION['ID']}'";
+        //             if($link->query($query))
+        //             {
+        //                 $result = $link->query($query);
+        //                 $row = $result->fetch_assoc();
+        //             }
+        //     }
+        //     // return $row['showDp'];
+        // ?>
+    }
+    </script>
     </div>
     </div>
     <div class="flex-r div2">

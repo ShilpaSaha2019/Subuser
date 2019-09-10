@@ -68,7 +68,11 @@ if(isset($_POST['save']))
             }
             else{
             
-                if($_FILES['image']['size']<=200000)
+                if(($_FILES['image']['size'])>200000)
+                {   
+                    echo "Image size should be less than euqal to 2mb!";
+                }
+                else
                 {
                 $target = "images/".basename($_FILES['image']['name']);
 
